@@ -587,25 +587,25 @@ bool BP::saveModelFile(const char* name)
 	fclose(fp3);
 
 
-	//FILE* fp = NULL;
-	//fopen_s(&fp,name, "wb");
-	//if (fp == NULL) {
-	//	return false;
-	//}
+	FILE* Fp = NULL;
+	fopen_s(&Fp,"BP.model", "wb");
+	if (Fp == NULL) {
+		return false;
+	}
 
-	//int num_node_input = num_node_input_BP;
-	//int num_node_hidden = num_node_hidden_BP;
-	//int num_node_output = num_node_output_BP;
-	//fwrite(&num_node_input, sizeof(int), 1, fp);
-	//fwrite(&num_node_hidden, sizeof(int), 1, fp);
-	//fwrite(&num_node_output, sizeof(int), 1, fp);
-//	fwrite(weight1, sizeof(float)*num_node_input_BP*num_node_hidden_BP, 1, fp);
-//	fwrite(threshold1, sizeof(float)*num_node_hidden_BP, 1, fp);
-//	fwrite(weight2, sizeof(float)*num_node_hidden_BP*num_node_output_BP, 1, fp);
-	//fwrite(threshold2, sizeof(float)*num_node_output_BP, 1, fp);
+	int num_node_input = num_node_input_BP;
+	int num_node_hidden = num_node_hidden_BP;
+	int num_node_output = num_node_output_BP;
+	fwrite(&num_node_input, sizeof(int), 1,  Fp);
+	fwrite(&num_node_hidden, sizeof(int), 1, Fp);
+	fwrite(&num_node_output, sizeof(int), 1, Fp);
+	fwrite(weight1, sizeof(float)*num_node_input_BP*num_node_hidden_BP, 1, Fp);
+	fwrite(threshold1, sizeof(float)*num_node_hidden_BP, 1, Fp);
+	fwrite(weight2, sizeof(float)*num_node_hidden_BP*num_node_output_BP, 1, Fp);
+	fwrite(threshold2, sizeof(float)*num_node_output_BP, 1, Fp);
 
-	//fflush(fp);
-	//fclose(fp);
+	fflush(Fp);
+	fclose(Fp);
 
 	return true;
 }
