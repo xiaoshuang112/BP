@@ -4,15 +4,39 @@
 #include "math.h"
 #include "Array_bp.h"
 #include "Bp_sdk.h"
+#include <intrin.h>
+
+#pragma intrinsic(exp)
 
 float BPcalcActivationFunction(float x)
 {
 	return 1.0 / (1.0 + exp(-x)); //formula[4] formula[5] formula[7]
 }
 
+
 void GetBpPara(Bp*para,int flag)//flag 为了区分调用的数组类别；//flag:0,小车，对应_S;flag:1,大车，对应_B
 {
-	Arrayinit(para->weight1, para->weight2,para->threshold1,para->threshold2, flag);
+//	Arrayinit(para->weight1, para->weight2,para->threshold1,para->threshold2, flag);
+
+	FILE* fp = NULL;
+	fopen_s(&fp, "bp.model", "rb");
+	if (fp == NULL) {
+		return  ;
+	}
+
+	int num_node_input, num_node_hidden, num_node_output;
+
+	fread(&num_node_input, sizeof(int), 1, fp);
+	fread(&num_node_hidden, sizeof(int), 1, fp);
+	fread(&num_node_output, sizeof(int), 1, fp);
+ 
+	fread(para->weight1, sizeof(float)*num_node_input*num_node_hidden, 1, fp);
+	fread(para->threshold1, sizeof(float)*num_node_hidden, 1, fp);
+	fread(para->weight2, sizeof(float)*num_node_hidden*num_node_output, 1, fp);
+	fread(para->threshold2, sizeof(float)*num_node_output, 1, fp);
+
+	fflush(fp);
+	fclose(fp);
 }
 
 
@@ -49,6 +73,7 @@ Bp Bpinit(int node_input,int node_hiden,int node_output,int flag)
 
 void BPcalcHiddenLayer(Bp bp, const int* data)
 {
+
 	for (int i = 0; i < bp.Node_hiden; i++) {
 		float tmp = 0;
 		for (int j = 0; j < bp.Node_input; j++) {
@@ -62,10 +87,14 @@ void BPcalcHiddenLayer(Bp bp, const int* data)
 
 void BPcalcOutputLayer(Bp bp)
 {
-	for (int i = 0; i < bp.Node_output; i++) {
+
+	for (int i = 0; i < bp.Node_output; i++) 
+	{
 		float tmp = 0;
-		for (int j = 0; j < bp.Node_hiden; j++) {
-			tmp += bp.output_hiddenLayer[j] * bp.weight2[j*bp.Node_output+i];
+
+		for (int j = 0; j < bp.Node_hiden; j++) 
+		{
+		 	tmp += bp.output_hiddenLayer[j] * bp.weight2[j*bp.Node_output+i];
 		}
 
 		tmp -= bp.threshold2[i]; //formula[6]
@@ -84,8 +113,10 @@ int BPpredict(Bp bp, int* data, int width, int height)
 	float max_value = -9999;
 	int ret = -1;
 
-	for (int i = 0; i < bp.Node_output; i++) {
-		if (bp.output_outputLayer[i] > max_value) {
+	for (int i = 0; i < bp.Node_output; i++) 
+	{
+		if (bp.output_outputLayer[i] > max_value) 
+		{
 			max_value = bp.output_outputLayer[i];
 			ret = i;
 		}
