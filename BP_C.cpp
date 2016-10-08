@@ -24,18 +24,18 @@ int _tmain(int argc, _TCHAR* argv[])
 int test_BP()
 {
 	//1. bp train
-	char TrainPath[MAX_PATH]="E:/1-work/work-space/BP/—µ¡∑ºØ/vallabel.txt";
-	char TestPath[MAX_PATH]="E:/1-work/work-space/BP/≤‚ ‘ºØ/vallabel.txt";
+	//char TrainPath[MAX_PATH]="E:/1-work/work-space/BP/—µ¡∑ºØ/vallabel.txt";
+	//char TestPath[MAX_PATH]="E:/1-work/work-space/BP/≤‚ ‘ºØ/vallabel.txt";
 
-	ANN::BP bp1;
-	bp1.init(TrainPath,TestPath);
-	bp1.train();
+	//ANN::BP bp1;
+	//bp1.init(TrainPath,TestPath);
+	//bp1.train();
 
- 	return 1;
+ //  	return 1;
 
 	//////////////////////////////////////////////////////////////////////////
 	std::string path_images = "E:/1-work/work-space/BP/BP_C/testData/";
-	Bp bp_s = Bpinit(1764,160,3,0);
+	Bp bp_s = Bpinit(1764,120,4,0);
 	int data_image[1764] = {0};
 	int nMeasure[4096],nTheta[4096],nHist[4096];
 
@@ -57,13 +57,17 @@ int test_BP()
 			cv::cvtColor(mat, mat, cv::COLOR_BGR2GRAY);
 		}
 
-		if (mat.cols != 64 || mat.rows != 64) {
+		if (mat.cols != 64 || mat.rows != 64) 
+		{
 			cv::resize(mat, mat, cv::Size(64, 64));
 		}
 		VL_GetImageHogFeature(data_image,mat.data,64,64,nMeasure,nTheta,nHist);
 
+		long t0 = cv::getTickCount();
 		int ret = BPpredict(bp_s,data_image, mat.cols, mat.rows);
-		std::cout << "correct result: " << i << ",    actual result: " << ret << std::endl;
+		long t1 = cv::getTickCount();
+		double secs = (t1 - t0)/cv::getTickFrequency();
+		std::cout << "correct result: " << i << ",    actual result: " << ret<<" Time is :" <<secs*1000<< std::endl;
 	}
 
 

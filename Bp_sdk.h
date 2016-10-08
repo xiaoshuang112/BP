@@ -9,7 +9,7 @@ struct Bp
 	float* threshold1/*        [num_node_hidden_BP]*/; //隐含层阈值
 	float* threshold2/*        [num_node_output_BP]*/; //输出层阈值
 	float* output_hiddenLayer/*[num_node_hidden_BP]*/; //顺传播，隐含层输出值
-	float* output_outputLayer/*[num_node_output_BP]*/; //顺传播，输出层输出值
+	int* output_outputLayer/*[num_node_output_BP]*/; //顺传播，输出层输出值
 
 	int Node_input;
 	int Node_hiden;

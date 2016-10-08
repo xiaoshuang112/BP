@@ -6,15 +6,21 @@
 #include <algorithm>
 #include <windows.h>
 #include <math.h>
-
+#include <omp.h>
 #include <string> 
 using namespace std; 
+
+//#include <features2d/features2d.hpp>
+//
+//#include <nonfree/nonfree.hpp>
 
 #include "opencv2/opencv.hpp"
 //#include "opencv2/objdetect/objdetect.hpp"
 
 #include "BP.h"
 #include "VLMain.h"
+
+
 
 namespace ANN {
 
@@ -237,16 +243,24 @@ int BP::VL_GetHOGFeature(int *pFeature, unsigned char* pSrc,int iW,int iH)
 	//img->imageData = (char*)pSrc;
 	//vector<float> descriptors;
 	//tHog.compute(img,descriptors,cv::Size(1,1), cv::Size(0,0));
+
+
 	cv::HOGDescriptor *hog=new cv::HOGDescriptor(cvSize(width_image_BP,height_image_BP),cvSize(16,16),cvSize(8,8),cvSize(8,8),9);   //具体意思见参考文章1,2
 	vector<float>descriptors;//结果数组
 	hog->compute(img, descriptors,cv::Size(1,1), cv::Size(0,0)); //调用计算函数开始计算
 
-	//cvReleaseImage(&img);
-	delete hog;
+	//cv::SiftFeatureDetector feature;
+
+	//vector<cv::KeyPoint> descriptors;
+
+	//feature.detect(img, descriptors);
+
+	
+	 delete hog; 
 
 	for (int r = 0; r < descriptors.size(); ++r) 
 	{
-		pFeature[r] = descriptors[r]*1000000;
+ 		pFeature[r] = descriptors[r]*1000000;
 	}
 
 	//float test;//结果数组
@@ -291,8 +305,8 @@ int BP::ReadFile(char *path, int* data_dst,int* Label_dst)
 			//cv::cvtColor(src, gray, CV_BGR2GRAY);
 			{
 			  //进行HOG特征提取
-			    //VL_GetHOGFeature(data_dst+i * num_node_input_BP,gray.data,gray.cols,gray.rows);
-				VL_GetImageHogFeature(data_dst+i * num_node_input_BP,src.data,src.cols,src.rows,nMeasure,nTheta,nHist);
+			     //VL_GetHOGFeature(data_dst+i * num_node_input_BP,src.data,src.cols,src.rows);
+				 VL_GetImageHogFeature(data_dst+i * num_node_input_BP,src.data,src.cols,src.rows,nMeasure,nTheta,nHist);
 				//保存对应标签
 			   int iLabel = atoi(LabelStr.c_str());
 			   Label_dst[i * num_node_output_BP + iLabel] = 1; 
@@ -378,6 +392,8 @@ void BP::init(const char* initrain,const char* initest)
 	}
 }
 
+
+
 float BP::calcActivationFunction(float x)
 {
 	return 1.0 / (1.0 + exp(-x)); //formula[4] formula[5] formula[7]
@@ -385,8 +401,10 @@ float BP::calcActivationFunction(float x)
 
 void BP::calcHiddenLayer(const int* data)
 {
+	#pragma omp parallel for
 	for (int i = 0; i < num_node_hidden_BP; i++) {
 		float tmp = 0;
+		#pragma omp parallel for
 		for (int j = 0; j < num_node_input_BP; j++) {
 			tmp += data[j] * weight1[j*num_node_hidden_BP+i];
 		}
@@ -398,14 +416,17 @@ void BP::calcHiddenLayer(const int* data)
 
 void BP::calcOutputLayer()
 {
+	#pragma omp parallel for
 	for (int i = 0; i < num_node_output_BP; i++) {
 		float tmp = 0;
+		#pragma omp parallel for
 		for (int j = 0; j < num_node_hidden_BP; j++) {
 			tmp += output_hiddenLayer[j] * weight2[j*num_node_output_BP+i];
 		}
 
 		tmp -= threshold2[i]; //formula[6]
 		output_outputLayer[i] = calcActivationFunction(tmp);
+		//output_outputLayer[i] = calcActivationFunction_outlayer(tmp);
 	}
 }
 
@@ -419,8 +440,10 @@ void BP::calcAdjuctOutputLayer(const int* data)
 
 void BP::calcAdjuctHiddenLayer()
 {
+	#pragma omp parallel for
 	for (int i = 0; i < num_node_hidden_BP; i++) {
 		float tmp = 0;
+		#pragma omp parallel for
 		for (int j = 0; j < num_node_output_BP; j++) {
 			tmp += weight2[i*num_node_output_BP+j] * adjust_error_outputLayer[j];
 		}
@@ -442,7 +465,9 @@ void BP::updateWeightThresholdOutputLayer()
 
 void BP::updateWeightThresholdHiddenLayer(const int* data)
 {
+	#pragma omp parallel for
 	for (int i = 0; i < num_node_hidden_BP; i++) {
+		#pragma omp parallel for
 		for (int j = 0; j < num_node_input_BP; j++) {
 			weight1[j*num_node_hidden_BP+i] += (beta_learning_BP * adjust_error_hiddenLayer[i] * data[j]); //formula[12]
 		}
@@ -450,6 +475,8 @@ void BP::updateWeightThresholdHiddenLayer(const int* data)
 		threshold1[i] += (beta_learning_BP * adjust_error_hiddenLayer[i]); //formula[13]
 	}
 }
+
+
 
 float BP::test()
 {

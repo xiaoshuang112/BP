@@ -6,11 +6,12 @@
 #include "Bp_sdk.h"
 #include <intrin.h>
 
-#pragma intrinsic(exp)
+ 
 
 float BPcalcActivationFunction(float x)
 {
-	return 1.0 / (1.0 + exp(-x)); //formula[4] formula[5] formula[7]
+//	return (1.0 / (1.0 + exp(-x))); //formula[4] formula[5] formula[7]
+	return (1.0 / (1.0 + pow((float)2.71,(-x))));
 }
 
 
@@ -62,8 +63,13 @@ Bp Bpinit(int node_input,int node_hiden,int node_output,int flag)
 	bp1.output_hiddenLayer = (float*)malloc(sizeof(float)*node_hiden);
 	memset(bp1.output_hiddenLayer,0,sizeof(float)*node_hiden);
 
-	bp1.output_outputLayer = (float*)malloc(sizeof(float)*node_output);
-	memset(bp1.output_outputLayer,0,sizeof(float)*node_output);
+	//bp1.output_outputLayer = (float*)malloc(sizeof(float)*node_output);
+	//memset(bp1.output_outputLayer,0,sizeof(float)*node_output);
+
+
+
+	bp1.output_outputLayer = (int*)malloc(sizeof(int)*node_output);
+	memset(bp1.output_outputLayer,0,sizeof(int)*node_output);
 
 	GetBpPara(&bp1,flag);
 
@@ -110,7 +116,7 @@ int BPpredict(Bp bp, int* data, int width, int height)
 	BPcalcHiddenLayer(bp, p);
 	BPcalcOutputLayer(bp);
 
-	float max_value = -9999;
+	int max_value = -9999;
 	int ret = -1;
 
 	for (int i = 0; i < bp.Node_output; i++) 

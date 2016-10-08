@@ -7,13 +7,13 @@ namespace ANN {
 #define num_node_input_BP	1764//756//3780//784 //输入层节点数
 #define width_image_BP		64//64//28 //归一化图像宽
 #define height_image_BP		64//32//28 //归一化图像高
-#define num_node_hidden_BP	160//160//120 //隐含层节点数
-#define num_node_output_BP	5 //输出层节点数
+#define num_node_hidden_BP	120//160//120 //隐含层节点数
+#define num_node_output_BP	4 //输出层节点数
 #define alpha_learning_BP	0.8//0.8 //输出层至隐含层学习率
 #define beta_learning_BP	0.6//0.6 //隐含层至输入层学习率
 #define patterns_train_BP	60000//60000 //训练模式对数(总数)
 #define patterns_test_BP	10000//10000 //测试模式对数(总数)
-#define iterations_BP		500   //10000 //最大训练次数
+#define iterations_BP		200   //10000 //最大训练次数
 #define accuracy_rate_BP	0.95 //要求达到的准确率
 
 	class BP {
@@ -38,7 +38,10 @@ namespace ANN {
 		void calcOutputLayer(); //计算输出层输出
 		void calcAdjuctOutputLayer(const int* data); //计算输出层校正误差
 		void calcAdjuctHiddenLayer(); //计算隐含层校正误差
+
 		float calcActivationFunction(float x); //计算激活函数，对数S形函数
+	//	float calcActivationFunction_outlayer(float x); //计算输出激活函数
+
 		void updateWeightThresholdOutputLayer(); //更新输出层至隐含层权值和阈值
 		void updateWeightThresholdHiddenLayer(const int* data); //更新隐含层至输入层权值和阈值
 		float test(); //训练完一次计算一次准确率
