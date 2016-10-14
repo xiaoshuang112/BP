@@ -14,7 +14,7 @@
 #include "VLMain.h"
 
 #define  WINSIZEX    64   //图像X方向尺寸
-#define  WINSIZEY    64    //图像Y方向尺寸
+#define  WINSIZEY    32    //图像Y方向尺寸
 #define  ORIENDIM    9     //方向维度 
 #define  ORIVALUE    20    //180/ORIENDIM
 #define  BLOCKSIZE   4     //每个块含有细胞个数

@@ -14,6 +14,7 @@
 #include "OSAL_type.h"
 #include "SDKCommon.h"
 
+
 	/*定义识别结果结构体*/
 typedef struct TagVLResult
 {

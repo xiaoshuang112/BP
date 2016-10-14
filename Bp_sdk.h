@@ -1,7 +1,8 @@
+#ifndef BPSDK_H
+#define BPSDK_H
 
 
-
-struct Bp
+typedef struct TagBp
 {
 	float* weight1/*[num_node_input_BP][num_node_hidden_BP]*/; //输入层至隐含层连接权值
 	float* weight2/*[num_node_hidden_BP][num_node_output_BP]*/; //隐含层至输出层连接权值
@@ -14,9 +15,12 @@ struct Bp
 	int Node_input;
 	int Node_hiden;
 	int Node_output;
-};
+}Bp;
 
-Bp  Bpinit(int node_input,int node_hiden,int node_output,int flag);
-int BPpredict(Bp bp, int* data, int width, int height);
+bool Bpinit(Bp*bp1,int node_input,int node_hiden,int node_output,int flag);
+
+int   BPpredict(Bp* bp, int* data);
+
 void Bprelease(Bp*bp);
 
+#endif
